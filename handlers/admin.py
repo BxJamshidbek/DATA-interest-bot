@@ -1,5 +1,5 @@
 from aiogram import Router, F
-from aiogram.types import Message, InputFile
+from aiogram.types import Message
 from aiogram.filters import Command
 from utils import save_video , get_videos
 from config import baza_kanal , ADMINS
@@ -34,6 +34,6 @@ async def video_handler(msg: Message):
         return
 
     save_video(file_id=video.file_id, caption=caption)
-    
+
     await msg.bot.send_video(chat_id=baza_kanal, video=video.file_id, caption=caption)
     await msg.answer("✅ Video saqlandi va kanalga yuborildi!")

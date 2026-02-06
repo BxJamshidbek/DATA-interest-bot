@@ -5,22 +5,20 @@ from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.types import ReplyKeyboardRemove
 from states import Registration_state
-from keyboards import phone_request
-from utils import save_user , create_tables
+from aiogram.types import CallbackQuery
+from keyboards import phone_request , interest_choice_keyboard , yes_or_no
+from utils import save_user 
 from config import admin_group , ADMINS
 from .user import USER_COMMANDS
 from .admin import ADMIN_COMMANDS
 
-
 reg_router = Router()
-create_tables()
 
 async def set_commands(bot, user_id: int):
     if user_id in ADMINS:
         await bot.set_my_commands(ADMIN_COMMANDS, scope=None)
     else:
         await bot.set_my_commands(USER_COMMANDS, scope=None)
-
 
 @reg_router.message(CommandStart())
 async def Registration(msg : Message , state :FSMContext):
@@ -96,4 +94,11 @@ async def telfon_raqami(msg : Message , state : FSMContext):
         telefon=telefon_raqami
     )
 
-    state.clear()
+    await state.set_state(Registration_state.user_interests)
+    await msg.answer("Iltimos video qo'llanmalarni olish ucuhn so'rovda qatnashishni tasdiqlang:" , 
+        reply_markup=yes_or_no() 
+    )
+
+
+
+

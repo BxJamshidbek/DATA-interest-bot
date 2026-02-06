@@ -5,4 +5,7 @@ class Registration_state(StatesGroup):
     familyasi = State()
     sharifi = State()
     telefon_raqami = State()
+    user_interests = State()
+
+    
     

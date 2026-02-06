@@ -3,6 +3,9 @@ import logging
 from aiogram import Bot , Dispatcher
 from config import token
 from handlers import Registration , reg_router , admin_router
+from utils import create_tables
+
+create_tables()
 
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=token)
