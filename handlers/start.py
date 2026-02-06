@@ -7,22 +7,39 @@ from aiogram.types import ReplyKeyboardRemove
 from states import Registration_state
 from keyboards import phone_request
 from utils import save_user , create_tables
-from config import admin_group
+from config import admin_group , ADMINS
+from .user import USER_COMMANDS
+from .admin import ADMIN_COMMANDS
 
 
-router = Router()
+reg_router = Router()
 create_tables()
 
-@router.message(CommandStart())
+async def set_commands(bot, user_id: int):
+    if user_id in ADMINS:
+        await bot.set_my_commands(ADMIN_COMMANDS, scope=None)
+    else:
+        await bot.set_my_commands(USER_COMMANDS, scope=None)
+
+
+@reg_router.message(CommandStart())
 async def Registration(msg : Message , state :FSMContext):
+
+    user_id = msg.from_user.id
+
+    await set_commands(msg.bot, user_id)
+
+    if user_id in ADMINS:
+        await msg.answer("Salom Admin! ")
+        return
+
     user_id = msg.from_user.id
     await msg.answer("Assalomu aleykum DATA talim stantsiyasining botiga xush kelibsiz!")
     await msg.answer(f"Ro'yxatdan o'tish boshlandi!\nIsmingizni kiriting:")
     
     await state.set_state(Registration_state.ism)
 
-
-@router.message(F.text , Registration_state.ism)
+@reg_router.message(F.text , Registration_state.ism)
 async def familyasi(msg : Message , state : FSMContext):
     ism = msg.text
     await state.update_data(ism = ism)
@@ -30,22 +47,21 @@ async def familyasi(msg : Message , state : FSMContext):
     
     await state.set_state(Registration_state.familyasi)
 
-
-@router.message(F.text , Registration_state.familyasi)
+@reg_router.message(F.text , Registration_state.familyasi)
 async def sharifi(msg : Message , state : FSMContext):
     familyasi = msg.text
     await state.update_data(familyasi = familyasi)
     await msg.answer(f"Iltimos sharifingizni kiriting:")
     await state.set_state(Registration_state.sharifi)
 
-@router.message(F.text , Registration_state.sharifi)
+@reg_router.message(F.text , Registration_state.sharifi)
 async def sharifi(msg : Message , state : FSMContext):
     sharifi = msg.text
     await state.update_data(sharifi = sharifi)
     await msg.answer(f"Telefon raqamingizni tastiqlang:" , reply_markup = phone_request())
     await state.set_state(Registration_state.telefon_raqami)
 
-@router.message(F.contact , Registration_state.telefon_raqami)
+@reg_router.message(F.contact , Registration_state.telefon_raqami)
 async def telfon_raqami(msg : Message , state : FSMContext):
 
     telefon_raqami = msg.contact.phone_number

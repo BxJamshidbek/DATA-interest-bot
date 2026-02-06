@@ -2,13 +2,14 @@ import asyncio
 import logging
 from aiogram import Bot , Dispatcher
 from config import token
-from handlers import Registration , router
+from handlers import Registration , reg_router , admin_router
 
 logging.basicConfig(level=logging.INFO)
 bot = Bot(token=token)
 dp = Dispatcher()
 
-dp.include_router(router)
+dp.include_router(reg_router)
+dp.include_router(admin_router)
 
 async def main():
 
