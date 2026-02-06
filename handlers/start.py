@@ -7,6 +7,7 @@ from aiogram.types import ReplyKeyboardRemove
 from states import Registration_state
 from keyboards import phone_request
 from utils import save_user , create_tables
+from config import admin_group
 
 
 router = Router()
@@ -46,6 +47,7 @@ async def sharifi(msg : Message , state : FSMContext):
 
 @router.message(F.contact , Registration_state.telefon_raqami)
 async def telfon_raqami(msg : Message , state : FSMContext):
+
     telefon_raqami = msg.contact.phone_number
     await state.update_data(telefon_raqami = telfon_raqami)
     await msg.answer(f"Ro'yxatga olish yakunlandi botimizdan to'liq foydalanishingiz mumkin.")
@@ -54,6 +56,17 @@ async def telfon_raqami(msg : Message , state : FSMContext):
     ismi = data.get("ism")
     familyasi = data.get("familyasi")
     sharifi = data.get("sharifi")
+
+    user_info = (
+    f"📌 Yangi foydalanuvchi ro‘yxatdan o‘tdi:\n\n"
+    f"Ism: {data.get('ism')}\n"
+    f"Familya: {data.get('familyasi')}\n"
+    f"Sharif: {data.get('sharifi')}\n"
+    f"Telefon: {data.get('telefon')}\n"
+    f"Telegram ID: {msg.from_user.id}"
+)
+
+    await msg.bot.send_message(chat_id=admin_group , text=user_info)
 
     await msg.answer(
         f"Sizning malumotlaringiz:\nIsm : {ismi}\nFamilya : {familyasi}\nSharif : {sharifi}\nTelefon raqam : {telefon_raqami}"
