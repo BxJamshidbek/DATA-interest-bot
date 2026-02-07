@@ -1,4 +1,4 @@
 token = "8587213335:AAHiiKfPKd3i3EZkg08DYRY_dKzdfCs7JGs"
-admin_group = "-1003749718704" 
+admin_group = "-1003749718704"
 baza_kanal = "-1003783210735"
-ADMINS = []
+ADMINS = [1679471522]
