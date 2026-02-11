@@ -1,5 +1,6 @@
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from states import TestState
 from utils.db import get_tests, get_subject_by_name, get_videos_by_score
@@ -144,8 +145,13 @@ async def finish_test(message: Message, state: FSMContext):
     videos = get_videos_by_score(subject_id, score)
     if videos:
         for file_id, caption in videos:
-            await message.bot.send_video(
-                chat_id=message.chat.id, video=file_id, caption=caption
-            )
+            try:
+                await message.bot.send_video(
+                    chat_id=message.chat.id, video=file_id, caption=caption
+                )
+            except TelegramBadRequest:
+                continue
+            except Exception:
+                continue
 
     await state.clear()

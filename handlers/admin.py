@@ -1,5 +1,6 @@
 from aiogram import Router, F
 from aiogram.types import Message, BotCommand, CallbackQuery
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command, StateFilter
 from utils.db import save_video, get_subjects
 from config import ADMINS, baza_kanal
@@ -91,9 +92,14 @@ async def video_score_handler(msg: Message, state: FSMContext):
         min_score=min_s,
         max_score=max_s,
     ):
-        await msg.bot.send_video(
-            chat_id=baza_kanal, video=data["video_file_id"], caption=data["caption"]
-        )
+        try:
+            await msg.bot.send_video(
+                chat_id=baza_kanal, video=data["video_file_id"], caption=data["caption"]
+            )
+        except TelegramBadRequest:
+            await msg.answer("⚠️ Videoni kanalga yuborishda xatolik yuz berdi!")
+        except Exception:
+            await msg.answer("⚠️ Kutilmagan xatolik yuz berdi!")
         await msg.answer("✅ Video muvaffaqiyatli saqlandi va kanalga yuborildi!")
     else:
         await msg.answer("⚠️ Xatolik yuz berdi yoki bu video allaqachon mavjud!")

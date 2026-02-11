@@ -1,5 +1,6 @@
 from aiogram import Router, F
 from aiogram.types import CallbackQuery, BotCommand, Message
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
 from states import Registration_state
 from utils.db import get_videos
@@ -76,12 +77,28 @@ async def get_user_interests(msg: Message, state: FSMContext):
                 found_videos.append((file_id, caption))
 
     if found_videos:
+        sent_count = 0
         for file_id, caption in found_videos:
-            await msg.bot.send_video(msg.from_user.id, video=file_id, caption=caption)
-        await msg.answer(
-            "✅ Sizning qiziqishlaringizga mos videolar topildi!",
-            reply_markup=return_to_menu_keyboard(),
-        )
+            try:
+                await msg.bot.send_video(
+                    msg.from_user.id, video=file_id, caption=caption
+                )
+                sent_count += 1
+            except TelegramBadRequest:
+                continue  # Skip deleted or invalid videos
+            except Exception:
+                continue
+
+        if sent_count > 0:
+            await msg.answer(
+                "✅ Sizning qiziqishlaringizga mos videolar topildi!",
+                reply_markup=return_to_menu_keyboard(),
+            )
+        else:
+            await msg.answer(
+                "😔 Afsuski, qiziqishlaringizga mos videolar topildi, lekin ularni yuborishda xatolik yuz berdi (ehtimol ular o'chirilgan).",
+                reply_markup=return_to_menu_keyboard(),
+            )
     else:
         await msg.answer(
             "😔 Afsuski, hozircha sizning qiziqishlaringizga mos videolar topilmadi. Keyinroq qayta urinib ko'ring yoki boshqa kalit so'zlarni kiriting.",
